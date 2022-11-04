@@ -10,13 +10,13 @@
 # We will use a pspline fit to estimate f: Use basis expansion
 # f=sum(beta_jb_j) where b_i are k evenly spaced Bspline basis functions, so the
 # model will be turned into a linear model y=Xbeta+e, where X_ij=b_j(x_i),
-# and beta is the vector of coefficients of basis functions.
+# and beta is the vector of coefficients for basis functions.
 # And we impose a penalty, for example order 2 difference
-# sum(beta_{i-1}-2beta_i+beta_{i+1})=beta^TD^TDbeta
+# sum(beta_{i-1}-2beta_i+beta_{i+1})^2=beta^TD^TDbeta
 # to avoid over-fitting, then estimate the linear model by penalized least squares 
 # min |y-Xbeta|^2+lambda*penalty
 # where lambda is the smoothing parameter.
-# So the estimated beta^hat=((X^TX+lambda*D^TD)^{-1}X^Ty, fitted value=Xbeta^hat.
+# So the estimated beta^hat=(X^TX+lambda*D^TD)^{-1}X^Ty, fitted value=Xbeta^hat.
 # For the best fit smoother, the smoothing parameter lambda will be selected by 
 # finding the value of λ to minimize the generalized cross validation criterion
 # GCV = estimated residual variance (sig2) / (n - effective degrees of freedom),
@@ -76,10 +76,14 @@ pspline <- function(x,y,k=20,logsp=c(-5,5),bord=3,pord=2,ngrid=100) {
   for (i in 1:ngrid) {
     diag_lambda <- 1/(1+lambda[i]*Lambda)
     edf[i] <- sum(diag_lambda)
+    # Each column of coef is the coefficients
+    # corresponding to each lambda trial value
     coef[,i] <- RU %*% (diag_lambda * UQy)
   }
   # Compute model fits for all trail values of lambda
-  fitted <- X %*% coef # fitted values
+  # Each column of fitted is the fitted values
+  # corresponding to each lambda trial value
+  fitted <- X %*% coef 
   sig2 <- colSums((y-fitted)^2)/(n-edf) # estimated residual variance
   gcv <- sig2/(n-edf) # generalized cross validation
 
