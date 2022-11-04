@@ -131,13 +131,13 @@ predict.pspline <- function(m,x,se=TRUE) {
   
   # Generate new X model matrix
   Xp <- splines::splineDesign(m$knots,x,ord=m$ord[1]+1,outer.ok=TRUE)
-  fitted <- Xp %*% m$coef #new fitted values
+  fitted <- Xp %*% m$coef # new fitted values
 
   if (se) {
     # The  required standard errors come from the
     # square roots of the leading diagonals 
     # of the predicted value covariance matrix X_pVX_p^T,
-    # where V is  the covariance matrix for the coefficients
+    # where V is the covariance matrix for the coefficients
     return(list(fit=fitted,se=rowSums(Xp * (Xp %*% m$cov))^.5))
   }
   else return(fitted)
